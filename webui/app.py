@@ -433,6 +433,24 @@ def default_server() -> str:
     return LOCAL_SERVER
 
 
+def server_label(key: str, url: str) -> str:
+    """Picker label: the first DNS label of a hostname (``gpu1`` of
+    ``gpu1.example``), but the whole address of an IP or localhost, whose first
+    piece (``192``) says nothing."""
+    from ipaddress import ip_address
+    from urllib.parse import urlsplit
+    u = urlsplit(url)
+    host = u.hostname or url
+    try:
+        ip_address(host)
+        literal = True
+    except ValueError:
+        literal = host == "localhost"
+    if literal:
+        return f"{key} · {host}:{u.port}" if u.port else f"{key} · {host}"
+    return f"{key} · {host.split('.')[0]}"
+
+
 def resolve_server(backend: str, server: Optional[str]) -> tuple[str, Optional[str]]:
     """``(lane, comfy_url)`` for a job. Only sd15 can leave this machine; every
     other backend runs locally whatever the picker says."""
@@ -962,8 +980,7 @@ def api_servers() -> JSONResponse:
              "queue": None, "downloading": False, "error": None,
              "ours": busy.get(LOCAL_SERVER, 0)}]
     for k, url in servers.items():
-        host = re.sub(r"^https?://", "", url).split(".")[0]
-        rows.append({"key": k, "kind": "comfy", "url": url, "label": f"{k} · {host}",
+        rows.append({"key": k, "kind": "comfy", "url": url, "label": server_label(k, url),
                      **probes[k], "ours": busy.get(k, 0)})
     return JSONResponse({"default": default_server(), "servers": rows})
 

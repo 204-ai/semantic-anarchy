@@ -57,6 +57,13 @@ def test_routing_names_keys_never_urls(servers):
         app.resolve_server("sd15", "http://evil.example")
 
 
+def test_server_label_keeps_ip_addresses_whole(app):
+    assert app.server_label("gpu1", "https://gpu1.example") == "gpu1 · gpu1"
+    assert app.server_label("B", "http://192.168.1.66:8188") == "B · 192.168.1.66:8188"
+    assert app.server_label("A", "http://127.0.0.1:8188") == "A · 127.0.0.1:8188"
+    assert app.server_label("L", "http://localhost") == "L · localhost"
+
+
 # ---- V1: work that drives the local pipeline never goes to ComfyUI --------
 def test_local_pipeline_jobs_never_get_the_comfy_checkpoint(servers, monkeypatch, tmp_path):
     app = servers

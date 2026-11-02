@@ -11,7 +11,7 @@ Promptless image generation ("Semantic Anarchy"): encode a corpus of prompts thr
 The repo uses a uv-managed Python 3.12 `.venv` (torch + diffusers + fastapi). Scripts are run as files, not as an installed package (each does `sys.path.insert(0, repo_root)`); there is no `pyproject.toml`.
 
 ```bash
-pytest -q                                   # full suite (88 tests, torch-free, ~9s)
+pytest -q                                   # full suite (89 tests, torch-free, ~9s)
 pytest tests/test_distribution.py -q        # one file
 pytest -q -k pca_samples_lie_in_subspace    # one test
 python scripts/demo_no_sd.py                # end-to-end demo on synthetic embeddings, no torch/GPU
